@@ -1,0 +1,39 @@
+:root {
+    --background: #040404;
+    --foreground: #FFF;
+    --accent: #007474;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--foreground)
+}
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+#overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    background-image: url("/images/overlay.png");
+    background-repeat: repeat;
+    animation: Static 2s steps(4) infinite;
+    box-shadow: inset 0 0 10em rgba(0, 0, 0, 0.4);
+}
+
+#overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    background-image: url("/images/overlay.png");
+    background-repeat: repeat;
+    animation: Static 2s steps(4) infinite;
+    box-shadow: inset 0 0 10em rgba(0, 0, 0, 0.4);
+}
