@@ -25,10 +25,11 @@
 		{ cx: '20%', cy: '55%', r: 45, dur: 19 },
 		{ cx: '95%', cy: '80%', r: 70, dur: 27 }
 	];
+
+	const mobileBlobs = blobs.filter((_, i) => i % 3 === 0);
 </script>
 
 <div class="bg"></div>
-
 <svg class="blob-cont" aria-hidden="true">
 	<defs>
 		<filter
@@ -44,18 +45,17 @@
 				in="blur"
 				mode="matrix"
 				values="1 0 0 0 0
-				        0 1 0 0 0
-				        0 0 1 0 0
-				        0 0 0 22 -9"
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 22 -9"
 				result="goo"
 			/>
 		</filter>
-
 		<mask id="blob-mask" x="0" y="0" width="100%" height="100%">
 			<g style="filter: url(#gooey)">
 				{#each blobs as blob, i (i)}
 					<circle
-						class="blob"
+						class="blob desktop-blob"
 						style="--i: {i}; --dur: {blob.dur}s; --start: {i * (360 / blobs.length)}deg;"
 						cx={blob.cx}
 						cy={blob.cy}
@@ -63,10 +63,19 @@
 						fill="white"
 					/>
 				{/each}
+				{#each mobileBlobs as blob, i (i)}
+					<circle
+						class="blob mobile-blob"
+						style="--i: {i}; --dur: {blob.dur}s; --start: {i * (360 / mobileBlobs.length)}deg;"
+						cx={blob.cx}
+						cy={blob.cy}
+						r={blob.r * 0.7}
+						fill="white"
+					/>
+				{/each}
 			</g>
 		</mask>
 	</defs>
-
 	<rect
 		x="0"
 		y="0"
@@ -87,31 +96,66 @@
 		height: 100%;
 		pointer-events: none;
 	}
-
 	.bg {
 		z-index: -2;
 		background: #040404;
 	}
-
 	.blob-cont {
 		z-index: -1;
 		opacity: 0.55;
+		will-change: transform;
 	}
-
 	.blob {
 		animation: orbit var(--dur, 20s) infinite linear;
 		animation-delay: calc(var(--i, 0) * -1.4s);
 		transform-box: fill-box;
 		transform-origin: center;
+		will-change: transform;
+	}
+
+	.desktop-blob {
+		display: block;
+	}
+	.mobile-blob {
+		display: none;
+	}
+
+	@media (max-width: 768px) {
+		.desktop-blob {
+			display: none;
+		}
+		.mobile-blob {
+			display: block;
+		}
+
+		#gooey feGaussianBlur {
+			stddeviation: 12;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.blob {
+			animation: none;
+		}
 	}
 
 	@keyframes orbit {
 		from {
-			transform: rotate(var(--start, 0deg)) translate(200px) rotate(calc(-1 * var(--start, 0deg)));
+			transform: rotate(var(--start, 0deg)) translate(var(--orbit-r, 200px))
+				rotate(calc(-1 * var(--start, 0deg)));
 		}
 		to {
-			transform: rotate(calc(var(--start, 0deg) + 360deg)) translate(200px)
+			transform: rotate(calc(var(--start, 0deg) + 360deg)) translate(var(--orbit-r, 200px))
 				rotate(calc(-1 * (var(--start, 0deg) + 360deg)));
+		}
+	}
+
+	:root {
+		--orbit-r: 200px;
+	}
+	@media (max-width: 768px) {
+		:root {
+			--orbit-r: 100px;
 		}
 	}
 </style>
