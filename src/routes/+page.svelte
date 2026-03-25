@@ -1,10 +1,12 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve */
+
 	import { onMount } from 'svelte';
 	import { photos } from '$lib/data/background';
 
 	let currentIndex = 0;
 	const duration = 30000; // ms
+	const preloadTime = 1000; // ms
 
 	function getRandomIndex(excludeIndex: number) {
 		let idx;
@@ -14,10 +16,9 @@
 		return idx;
 	}
 
-	function showNext() {
-		const nextIndex = getRandomIndex(currentIndex);
-		document.body.style.backgroundImage = `url('${photos[nextIndex].imageUrl}')`;
-		currentIndex = nextIndex;
+	function preloadImage(index: number) {
+		const img = new Image();
+		img.src = photos[index].imageUrl;
 	}
 
 	onMount(() => {
@@ -28,7 +29,15 @@
 		document.body.style.backgroundRepeat = 'no-repeat';
 		document.body.style.backgroundImage = `url('${photos[currentIndex].imageUrl}')`;
 
-		const interval = setInterval(showNext, duration);
+		const interval = setInterval(() => {
+			const nextIndex = getRandomIndex(currentIndex);
+			preloadImage(nextIndex);
+			setTimeout(() => {
+				document.body.style.backgroundImage = `url('${photos[nextIndex].imageUrl}')`;
+				currentIndex = nextIndex;
+			}, preloadTime);
+		}, duration - preloadTime);
+
 		return () => clearInterval(interval);
 	});
 </script>
